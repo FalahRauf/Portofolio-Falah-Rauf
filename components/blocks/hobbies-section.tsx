@@ -228,22 +228,26 @@ export default function HobbiesSection() {
 
                     {/* Realistic Spinning CD Vinyl Disc on top of album (z-20) */}
                     <motion.div
-                      animate={{
-                        rotate: isPlaying ? 360 : 0,
-                      }}
-                      transition={{
-                        rotate: { repeat: Infinity, duration: 2.2, ease: 'linear' },
-                      }}
-                      className="absolute -right-4 -bottom-4 size-28 sm:size-32 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,0,0,0.6)] z-20 flex items-center justify-center overflow-hidden border-2 border-white/30 transition-transform duration-300 group-hover:scale-105"
-                      style={{
-                        background:
-                          song.discTheme === 'laufey'
-                            ? 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #f6ead8, #efc9c0, #fdf3e0, #d8c8a8, #f3d9d2, #c9b98f, #f8eee0, #b7a88a, #f2dcd3, #efc9c0, #f6ead8)'
-                            : song.discTheme === 'oasis'
-                            ? 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #e2e8f0, #cbd5e1, #94a3b8, #cbd5e1, #f1f5f9, #94a3b8, #cbd5e1, #e2e8f0)'
-                            : 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #fef3c7, #fde68a, #f59e0b, #d97706, #fde68a, #fef3c7, #d97706, #fef3c7)',
-                      }}
+                      animate={isPlaying ? { rotate: 360 } : { rotate: 0 }}
+                      transition={
+                        isPlaying
+                          ? { repeat: Infinity, duration: 2.2, ease: 'linear' }
+                          : { duration: 0.4, ease: 'easeOut' }
+                      }
+                      style={{ transformOrigin: '50% 50%' }}
+                      className="absolute -right-4 -bottom-4 size-28 sm:size-32 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,0,0,0.6)] z-20 flex items-center justify-center overflow-hidden border-2 border-white/30 group-hover:scale-105"
                     >
+                      <div
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background:
+                            song.discTheme === 'laufey'
+                              ? 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #f6ead8, #efc9c0, #fdf3e0, #d8c8a8, #f3d9d2, #c9b88f, #f8eee0, #b7a88a, #f2dcd3, #efc9c0, #f6ead8)'
+                              : song.discTheme === 'oasis'
+                              ? 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #e2e8f0, #cbd5e1, #94a3b8, #cbd5e1, #f1f5f9, #94a3b8, #cbd5e1, #e2e8f0)'
+                              : 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #fef3c7, #fde68a, #f59e0b, #d97706, #fde68a, #fef3c7, #d97706, #fef3c7)',
+                        }}
+                      />
                       {/* CD Concentric Grooves */}
                       <div className="absolute inset-2.5 rounded-full border border-black/15" />
                       <div className="absolute inset-5 rounded-full border border-black/15" />
@@ -257,12 +261,30 @@ export default function HobbiesSection() {
                     </motion.div>
                   </div>
 
-                  {/* 4 Amber / Gold Dots (Exactly like screenshot) */}
-                  <div className="flex items-center justify-center gap-2 mb-3 mt-1">
-                    <span className={`size-1.5 rounded-full transition-colors ${isPlaying ? 'bg-amber-400 animate-ping' : 'bg-amber-500'}`} />
-                    <span className="size-1.5 rounded-full bg-amber-500" />
-                    <span className="size-1.5 rounded-full bg-amber-500" />
-                    <span className="size-1.5 rounded-full bg-amber-500" />
+                  {/* 4 Amber Equalizer Dots — animate scaleY when playing */}
+                  <div className="flex items-end justify-center gap-2 mb-3 mt-1 h-3" aria-hidden="true">
+                    {[0, 1, 2, 3].map((dotIdx) => (
+                      <motion.span
+                        key={dotIdx}
+                        className="w-1.5 rounded-full bg-amber-500"
+                        style={{ originY: 0.5 }}
+                        animate={
+                          isPlaying
+                            ? { scaleY: [0.4, 1.6, 0.6, 1.2, 0.4] }
+                            : { scaleY: 1 }
+                        }
+                        transition={
+                          isPlaying
+                            ? {
+                                duration: 0.9,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                                delay: dotIdx * 0.12,
+                              }
+                            : { duration: 0.3, ease: 'easeOut' }
+                        }
+                      />
+                    ))}
                   </div>
 
                   {/* Track Title (Bold) */}
