@@ -187,11 +187,11 @@ export default function HobbiesSection() {
           </BlurFadeIn>
         </div>
 
-        {/* 2. Lagu Favorit Section — Exact 3-Card Layout matching Screenshot */}
+        {/* 2. Favorite Music Section — Exact 3-Card Layout matching Screenshot */}
         <div className="pt-10 border-t border-white/10">
           <BlurFadeIn delay={0.1} className="mb-12">
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-white uppercase font-mono">
-              Lagu Favorit
+              Favorite Music
             </h3>
           </BlurFadeIn>
 

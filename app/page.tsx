@@ -140,7 +140,7 @@ export default function Home() {
         <TaglineMarquee items={taglines} direction="left" />
 
         {/* ============================================================
-            4. STACK (Interactive Category Grid with Brand Hover Tooltips)
+            4. SKILLS (Interactive Category Grid with Brand Hover Tooltips)
             ============================================================ */}
         <StackKintaro />
 

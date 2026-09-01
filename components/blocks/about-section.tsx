@@ -164,8 +164,7 @@ export default function AboutSection() {
                   <span className="italic font-serif text-white">Tailwind CSS</span>,{' '}
                   <span className="italic font-serif text-white">TypeScript</span>,{' '}
                   <span className="italic font-serif text-white">PHP / Laravel</span>, and{' '}
-                  <span className="italic font-serif text-white">MySQL / PostgreSQL</span>. Along with these, I develop interactive desktop and game applications with tools like{' '}
-                  <span className="italic font-serif text-white">Tauri</span> and game engines.
+                  <span className="italic font-serif text-white">MySQL / Firebase</span>. Along with these, I develop interactive game applications and explore modern UI patterns with passion.
                 </p>
 
                 <p>

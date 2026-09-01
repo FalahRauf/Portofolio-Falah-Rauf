@@ -57,7 +57,7 @@ export default function ContactBlock({
           [005]
         </p>
         <h2 className="text-4xl md:text-7xl font-bold tracking-tighter text-white mb-6">
-          MARI TERHUBUNG
+          CONTACT
         </h2>
         <p className="text-lg md:text-xl text-neutral-400 max-w-2xl leading-relaxed">
           Mau ngobrol soal musik, game, kolaborasi proyek, atau software engineering? Hubungi saya lewat tombol kontak di bawah.

@@ -68,16 +68,6 @@ export default function StackKintaro() {
           ),
         },
         {
-          name: 'Bootstrap',
-          category: 'FRONTEND TECHNOLOGIES',
-          color: '#7952B3',
-          iconSvg: (
-            <svg viewBox="0 0 512 512" className="size-5 fill-current" fill="#7952B3">
-              <path d="M416 32H96C60.65 32 32 60.65 32 96v320c0 35.35 28.65 64 64 64h320c35.35 0 64-28.65 64-64V96c0-35.35-28.65-64-64-64zM294.6 345.5c-15.6 7.6-35.4 11.4-59.4 11.4h-55.8V155.1h55.8c24 0 43.8 3.8 59.4 11.4 15.6 7.6 23.4 20.4 23.4 38.4 0 11.4-3.6 21-10.8 28.8-7.2 7.8-17.4 13.2-30.6 16.2v1.2c16.2 3 28.2 8.4 36 16.2 7.8 7.8 11.7 18 11.7 30.6 0 20.4-8.7 35.1-26.1 44.1zm-75.9-63h27.9c10.8 0 19.2-2.1 25.2-6.3 6-4.2 9-10.5 9-18.9s-3-14.7-9-18.9c-6-4.2-14.4-6.3-25.2-6.3h-27.9v50.4zm0 29.7v54.9h32.4c12 0 21.3-2.4 27.9-7.2 6.6-4.8 9.9-12 9.9-21.6 0-9.6-3.3-16.8-9.9-21.6-6.6-4.8-15.9-4.5-27.9-4.5h-32.4z" />
-            </svg>
-          ),
-        },
-        {
           name: 'Framer Motion',
           category: 'FRONTEND TECHNOLOGIES',
           color: '#0055FF',
@@ -166,26 +156,6 @@ export default function StackKintaro() {
           ),
         },
         {
-          name: 'ASP.NET',
-          category: 'BACKEND TECHNOLOGIES',
-          color: '#512BD4',
-          iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#512BD4">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5h-2V11h2v5.5zm0-7.5h-2V7h2v2z" />
-            </svg>
-          ),
-        },
-        {
-          name: 'Rust',
-          category: 'BACKEND TECHNOLOGIES',
-          color: '#DEA584',
-          iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#DEA584">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-            </svg>
-          ),
-        },
-        {
           name: 'C#',
           category: 'BACKEND TECHNOLOGIES',
           color: '#239120',
@@ -205,35 +175,15 @@ export default function StackKintaro() {
             </svg>
           ),
         },
-        {
-          name: 'Discord.js',
-          category: 'BACKEND TECHNOLOGIES',
-          color: '#5865F2',
-          iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#5865F2">
-              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-            </svg>
-          ),
-        },
       ],
     },
     {
       number: '03',
-      title: 'DATABASES & ORMS',
+      title: 'DATABASES & BACKEND SERVICES',
       items: [
         {
-          name: 'PostgreSQL',
-          category: 'DATABASES & ORMS',
-          color: '#4169E1',
-          iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#4169E1">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5h-2V11h2v5.5zm0-7.5h-2V7h2v2z" />
-            </svg>
-          ),
-        },
-        {
           name: 'MySQL',
-          category: 'DATABASES & ORMS',
+          category: 'DATABASES & BACKEND SERVICES',
           color: '#4479A1',
           iconSvg: (
             <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#4479A1">
@@ -242,32 +192,12 @@ export default function StackKintaro() {
           ),
         },
         {
-          name: 'MongoDB',
-          category: 'DATABASES & ORMS',
-          color: '#47A248',
+          name: 'Firebase',
+          category: 'DATABASES & BACKEND SERVICES',
+          color: '#FFCA28',
           iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#47A248">
-              <path d="M12 0C11.5 0 11 .3 10.8.7L5.2 11.2c-.3.6-.3 1.3 0 1.9l5.6 10.2c.2.4.7.7 1.2.7s1-.3 1.2-.7l5.6-10.2c.3-.6.3-1.3 0-1.9L13.2.7C13 .3 12.5 0 12 0z" />
-            </svg>
-          ),
-        },
-        {
-          name: 'Prisma',
-          category: 'DATABASES & ORMS',
-          color: '#2D3748',
-          iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#2D3748">
-              <path d="M12 2L1 21h22L12 2zm0 4.5l7 12.5H5l7-12.5z" />
-            </svg>
-          ),
-        },
-        {
-          name: 'Neon',
-          category: 'DATABASES & ORMS',
-          color: '#00E5FF',
-          iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#00E5FF">
-              <path d="M12 2L2 22h20L12 2zm0 6l5 10H7l5-10z" />
+            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#FFCA28">
+              <path d="M19.6 14.2c-.1-.1-.1-.2 0-.3l1.7-2.6c.1-.2 0-.4-.1-.5l-2.4-1.4c-.1 0-.2-.1-.3 0-.1.1-.1.2-.1.3l.1 1.7c0 .1 0 .2-.1.2-.1.1-.2 0-.2 0l-1.6-1c-.1-.1-.2-.1-.3 0L14.7 12c-.1.1-.1.2 0 .3l1.4 2.1c.1.1.2.1.3.1l1.7-1c.1-.1.2 0 .2.1l-.1 1.5c0 .1 0 .2.1.3.1.1.2.1.3 0l2.4-1.4c.2-.1.2-.3.1-.5l-1.5-1.3zM12 3.6c-.3 0-.6.1-.8.3L4.6 7.4c-.5.3-.8.8-.8 1.4v6.4c0 .6.3 1.1.8 1.4l6.6 3.5c.5.3 1.1.3 1.6 0l6.6-3.5c.5-.3.8-.8.8-1.4V8.8c0-.6-.3-1.1-.8-1.4l-6.6-3.5c-.2-.2-.5-.3-.8-.3zM12 0L3.6 4.8C2.7 5.3 2 6.2 2 7.4v9.2c0 1.2.7 2.1 1.6 2.6L12 24l8.4-4.8c.9-.5 1.6-1.4 1.6-2.6V7.4c0-1.2-.7-2.1-1.6-2.6L12 0z" />
             </svg>
           ),
         },
@@ -297,17 +227,6 @@ export default function StackKintaro() {
             </svg>
           ),
         },
-        {
-          name: 'Tauri',
-          category: 'TOOLS & INFRASTRUCTURE',
-          color: '#FFC131',
-          iconSvg: (
-            <svg viewBox="0 0 24 24" className="size-5 fill-current" fill="#FFC131">
-              <circle cx="8" cy="12" r="5" fill="none" stroke="#FFC131" strokeWidth="2" />
-              <circle cx="16" cy="12" r="5" fill="none" stroke="#FFC131" strokeWidth="2" />
-            </svg>
-          ),
-        },
       ],
     },
   ];
@@ -318,14 +237,14 @@ export default function StackKintaro() {
         {/* Section Marker */}
         <BlurFadeIn className="mb-6">
           <p className="text-xs md:text-sm tracking-[0.3em] text-neutral-500 font-mono uppercase">
-            [002]
+            [003]
           </p>
         </BlurFadeIn>
 
         {/* Section Title */}
         <BlurFadeIn delay={0.1} className="mb-16">
           <h2 className="text-5xl md:text-8xl font-bold tracking-tighter text-white">
-            STACK
+            SKILLS
           </h2>
         </BlurFadeIn>
 

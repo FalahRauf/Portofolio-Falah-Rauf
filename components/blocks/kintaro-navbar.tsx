@@ -7,7 +7,7 @@ import { Globe, Moon } from 'lucide-react';
 const navLinks = [
   { name: 'HOME', href: '#hero' },
   { name: 'ABOUT', href: '#about' },
-  { name: 'STACK', href: '#stack' },
+  { name: 'SKILLS', href: '#stack' },
   { name: 'PROJECTS', href: '#projects' },
   { name: 'ROADMAP', href: '#roadmap' },
   { name: 'CONTACT', href: '#contact' },
