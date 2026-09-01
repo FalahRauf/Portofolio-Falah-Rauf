@@ -24,20 +24,20 @@ const taglines = [
   'INTENTIONAL MINIMALISM',
 ];
 
-// Left column portraits (Scrolls UP infinitely)
+// Left column portraits (Scrolls UP infinitely) — local assets from Falah's photo archive
 const portraitsLeft = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80',
-  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&q=80',
+  '/assets/hero/hero-1-building-night.jpg',
+  '/assets/hero/hero-2-practice-studio.jpg',
+  '/assets/hero/hero-3-tech-wave.jpg',
+  '/assets/hero/hero-4-classmates.jpg',
 ];
 
-// Right column portraits (Scrolls DOWN infinitely)
+// Right column portraits (Scrolls DOWN infinitely) — local assets from Falah's photo archive
 const portraitsRight = [
-  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80',
-  'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&q=80',
-  'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&q=80',
+  '/assets/hero/hero-5-headbands.jpg',
+  '/assets/hero/hero-6-orangutan-meme.jpg',
+  '/assets/hero/hero-7-building-nightscape.jpg',
+  '/assets/hero/hero-8-hamburgur-meme.jpg',
 ];
 
 const projects = [
