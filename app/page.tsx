@@ -30,6 +30,7 @@ const portraitsLeft = [
   '/assets/hero/hero-2-practice-studio.jpg',
   '/assets/hero/hero-3-tech-wave.jpg',
   '/assets/hero/hero-4-classmates.jpg',
+  '/assets/hero/hero-9-cat.jpg',
 ];
 
 // Right column portraits (Scrolls DOWN infinitely) — local assets from Falah's photo archive
@@ -38,6 +39,7 @@ const portraitsRight = [
   '/assets/hero/hero-6-orangutan-meme.jpg',
   '/assets/hero/hero-7-building-nightscape.jpg',
   '/assets/hero/hero-8-hamburgur-meme.jpg',
+  '/assets/hero/hero-10-classroom.jpg',
 ];
 
 const projects = [

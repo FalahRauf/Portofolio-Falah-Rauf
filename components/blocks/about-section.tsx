@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { User, X, ArrowRight, Sparkles } from 'lucide-react';
 import { BlurFadeIn } from './motion-primitives';
 
@@ -109,50 +108,6 @@ export default function AboutSection() {
               </BlurFadeIn>
             </div>
           </div>
-
-          {/* ================= PHOTO GALLERY STRIP (Falah's photo archive) ================= */}
-          <BlurFadeIn delay={0.5} className="mt-16 md:mt-20">
-            <p className="text-xs md:text-sm tracking-[0.3em] text-neutral-500 font-mono uppercase mb-5">
-              <span className="text-neutral-300">//</span> From the archive
-            </p>
-            <div className="grid grid-cols-2 gap-4 md:gap-6">
-              <div className="group relative aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-2xl">
-                <Image
-                  src="/assets/hero/about-1-classroom.jpg"
-                  alt="Falah and classmates in red uniform blazers at SMK Telkom Purwokerto"
-                  fill
-                  sizes="(max-width: 768px) 50vw, 540px"
-                  className="object-cover grayscale contrast-110 transition-[filter] duration-500 group-hover:grayscale-0"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent" />
-                <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
-                  <div>
-                    <p className="text-xs font-mono tracking-widest uppercase text-white/80">No. 01</p>
-                    <p className="text-sm md:text-base font-semibold tracking-tight">Classroom Crew</p>
-                  </div>
-                  <span className="text-[10px] font-mono tracking-widest text-white/50 uppercase">SMK Telkom</span>
-                </div>
-              </div>
-
-              <div className="group relative aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-2xl">
-                <Image
-                  src="/assets/hero/about-2-cat.jpg"
-                  alt="Falah's tuxedo cat close-up, a familiar face at home"
-                  fill
-                  sizes="(max-width: 768px) 50vw, 540px"
-                  className="object-cover grayscale contrast-110 transition-[filter] duration-500 group-hover:grayscale-0"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent" />
-                <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
-                  <div>
-                    <p className="text-xs font-mono tracking-widest uppercase text-white/80">No. 02</p>
-                    <p className="text-sm md:text-base font-semibold tracking-tight">Studio Buddy</p>
-                  </div>
-                  <span className="text-[10px] font-mono tracking-widest text-white/50 uppercase">Home</span>
-                </div>
-              </div>
-            </div>
-          </BlurFadeIn>
         </div>
       </section>
 
