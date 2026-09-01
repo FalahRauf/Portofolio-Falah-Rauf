@@ -114,7 +114,7 @@ export default function HeroKintaro({
           <div className="relative h-full overflow-hidden pt-[21vh]">
             <motion.div
               animate={reduceMotion ? { y: 0 } : { y: ['0%', '-50%'] }}
-              transition={{ duration: 24, ease: 'linear', repeat: reduceMotion ? 0 : Infinity }}
+              transition={{ duration: 40, ease: 'linear', repeat: reduceMotion ? 0 : Infinity }}
               className="flex flex-col gap-4 lg:gap-5 will-change-transform"
             >
               {col1Images.map((src, i) => (
@@ -136,7 +136,7 @@ export default function HeroKintaro({
           <div className="relative h-full overflow-hidden pt-[7vh]">
             <motion.div
               animate={reduceMotion ? { y: 0 } : { y: ['-50%', '0%'] }}
-              transition={{ duration: 26, ease: 'linear', repeat: reduceMotion ? 0 : Infinity }}
+              transition={{ duration: 42, ease: 'linear', repeat: reduceMotion ? 0 : Infinity }}
               className="flex flex-col gap-4 lg:gap-5 will-change-transform"
             >
               {col2Images.map((src, i) => (
