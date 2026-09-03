@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
+import { Play, Pause, Music2, Guitar, Piano, Drum, AudioWaveform } from 'lucide-react';
 import { BlurFadeIn } from './motion-primitives';
 
 interface SongItem {
@@ -45,30 +46,117 @@ const favoriteSongs: SongItem[] = [
   },
 ];
 
+/* Instruments.
+   One icon system for all three: stroke-based, currentColor, identical optical
+   weight. The previous version mixed two detailed skeuomorphic illustrations
+   with a hand-positioned pile of <div>s for the piano, which read as three
+   unrelated components sitting next to each other. */
+const instruments = [
+  {
+    id: 'strings',
+    label: 'Strings',
+    accent: 'amber',
+    Icon: Guitar,
+    title: 'Gitar Akustik & Elektrik',
+    desc: 'Menemukan progresi akord dan melodi pengiring saat istirahat.',
+    ring: 'group-hover:border-amber-400/40',
+    icon: 'text-amber-300',
+    glow: 'group-hover:shadow-[0_0_40px_-12px_rgba(251,191,36,0.45)]',
+  },
+  {
+    id: 'percussion',
+    label: 'Percussion',
+    accent: 'blue',
+    Icon: Drum,
+    title: 'Drum & Beat',
+    desc: 'Menjaga tempo, dinamika ritmis, dan sinkronisasi beat lagu.',
+    ring: 'group-hover:border-sky-400/40',
+    icon: 'text-sky-300',
+    glow: 'group-hover:shadow-[0_0_40px_-12px_rgba(56,189,248,0.45)]',
+  },
+  {
+    id: 'keys',
+    label: 'Keys',
+    accent: 'purple',
+    Icon: Piano,
+    title: 'Keyboard & Piano',
+    desc: 'Harmonisasi akord dan melodi tuts piano untuk aransemen santai.',
+    ring: 'group-hover:border-violet-400/40',
+    icon: 'text-violet-300',
+    glow: 'group-hover:shadow-[0_0_40px_-12px_rgba(167,139,250,0.45)]',
+  },
+];
+
+const discThemes: Record<SongItem['discTheme'], string> = {
+  laufey:
+    'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #f6ead8, #efc9c0, #fdf3e0, #d8c8a8, #f3d9d2, #c9b88f, #f8eee0, #b7a88a, #f2dcd3, #efc9c0, #f6ead8)',
+  oasis:
+    'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #e2e8f0, #cbd5e1, #94a3b8, #cbd5e1, #f1f5f9, #94a3b8, #cbd5e1, #e2e8f0)',
+  mac: 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #fef3c7, #fde68a, #f59e0b, #d97706, #fde68a, #fef3c7, #d97706, #fef3c7)',
+};
+
+function formatTime(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 export default function HobbiesSection() {
-  const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
-  const audioRefs = useRef<{ [key: string]: HTMLAudioElement | null }>({});
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+  const reduceMotion = useReducedMotion();
 
-  const togglePlay = (id: string) => {
-    // Pause previous audio if switching
-    if (currentPlaying && currentPlaying !== id) {
-      const prevAudio = audioRefs.current[currentPlaying];
-      if (prevAudio) {
-        prevAudio.pause();
-        prevAudio.currentTime = 0;
+  // One interval for the active track rather than a `timeupdate` listener per
+  // element — timeupdate fires 4x/sec each, and only one track can play at once.
+  useEffect(() => {
+    if (!isPlaying) return;
+    const id = window.setInterval(() => {
+      const audio = currentId ? audioRefs.current[currentId] : null;
+      if (!audio) return;
+      setProgress(audio.currentTime);
+      if (audio.duration && !Number.isNaN(audio.duration)) setDuration(audio.duration);
+    }, 250);
+    return () => window.clearInterval(id);
+  }, [isPlaying, currentId]);
+
+  const pauseAll = useCallback((except?: string) => {
+    Object.entries(audioRefs.current).forEach(([id, audio]) => {
+      if (!audio || id === except) return;
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  }, []);
+
+  const togglePlay = useCallback(
+    (id: string) => {
+      const audio = audioRefs.current[id];
+      if (!audio) return;
+
+      if (currentId === id && isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+        return;
       }
-    }
 
-    const currentAudio = audioRefs.current[id];
-    if (!currentAudio) return;
+      pauseAll(id);
+      setCurrentId(id);
+      setProgress(audio.currentTime);
+      audio.play().catch(() => setIsPlaying(false));
+    },
+    [currentId, isPlaying, pauseAll]
+  );
 
-    if (currentPlaying === id) {
-      currentAudio.pause();
-      setCurrentPlaying(null);
-    } else {
-      currentAudio.play().catch((e) => console.log('Playback error:', e));
-      setCurrentPlaying(id);
-    }
+  const handleSeek = (id: string, event: React.MouseEvent<HTMLDivElement>) => {
+    const audio = audioRefs.current[id];
+    if (!audio || !audio.duration) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+    audio.currentTime = ratio * audio.duration;
+    setProgress(audio.currentTime);
   };
 
   return (
@@ -91,211 +179,280 @@ export default function HobbiesSection() {
           </p>
         </BlurFadeIn>
 
-        {/* 1. Interactive Instrument Visual Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-          {/* GITAR CARD */}
-          <BlurFadeIn delay={0.15}>
-            <div className="group rounded-3xl border border-white/10 bg-neutral-900/80 p-7 flex flex-col justify-between shadow-2xl hover:border-amber-500/40 transition-all duration-300">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Strings</span>
-                <span className="text-xs font-mono text-amber-400">Acoustic</span>
-              </div>
-              {/* Guitar Illustration SVG */}
-              <div className="h-36 flex items-center justify-center my-3 group-hover:scale-105 transition-transform duration-300">
-                <svg className="h-32 w-auto" viewBox="0 0 200 270" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="88" y="2" width="26" height="30" rx="6" fill="#5c381e" />
-                  <circle cx="94" cy="10" r="2.5" fill="#fcd34d" />
-                  <circle cx="101" cy="10" r="2.5" fill="#fcd34d" />
-                  <circle cx="108" cy="10" r="2.5" fill="#fcd34d" />
-                  <rect x="93" y="30" width="15" height="105" rx="3" fill="#784824" />
-                  <circle cx="100" cy="168" r="46" fill="#b45309" />
-                  <circle cx="100" cy="212" r="60" fill="#d97706" />
-                  <circle cx="100" cy="172" r="21" fill="#451a03" />
-                  <circle cx="100" cy="172" r="17" fill="#1c1917" />
-                  <rect x="78" y="240" width="44" height="9" rx="3" fill="#451a03" />
-                  <line x1="96" y1="34" x2="96" y2="242" stroke="#fef3c7" strokeWidth="1.5" />
-                  <line x1="100.5" y1="34" x2="100.5" y2="242" stroke="#fef3c7" strokeWidth="1.5" />
-                  <line x1="105" y1="34" x2="105" y2="242" stroke="#fef3c7" strokeWidth="1.5" />
-                </svg>
-              </div>
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <h3 className="text-xl font-bold text-white tracking-tight">Gitar Akustik &amp; Elektrik</h3>
-                <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed">Menemukan progresi akord dan melodi pengiring saat istirahat.</p>
-              </div>
-            </div>
-          </BlurFadeIn>
+        {/* 1. Instrument cards — one icon system, one layout rhythm */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-24">
+          {instruments.map((item, idx) => {
+            const Icon = item.Icon;
+            return (
+              <BlurFadeIn key={item.id} delay={0.15 + idx * 0.1} className="h-full">
+                <motion.div
+                  whileHover={reduceMotion ? undefined : { y: -6 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                  className={`group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/60 p-7 flex flex-col transition-colors duration-300 ${item.ring} ${item.glow} focus-within:border-white/30`}
+                >
+                  {/* Accent wash — sits behind content, fades in on hover */}
+                  <div
+                    className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: `radial-gradient(120% 80% at 50% 0%, currentColor 0%, transparent 60%)`,
+                      color: 'transparent',
+                    }}
+                    aria-hidden="true"
+                  />
 
-          {/* DRUM CARD */}
-          <BlurFadeIn delay={0.25}>
-            <div className="group rounded-3xl border border-white/10 bg-neutral-900/80 p-7 flex flex-col justify-between shadow-2xl hover:border-blue-500/40 transition-all duration-300">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Percussion</span>
-                <span className="text-xs font-mono text-blue-400">Rhythm</span>
-              </div>
-              {/* Drum Illustration SVG */}
-              <div className="h-36 flex items-center justify-center my-3 group-hover:scale-105 transition-transform duration-300">
-                <svg className="h-32 w-auto" viewBox="0 0 220 190" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="62" y="92" width="96" height="66" rx="10" fill="#1e3a8a" />
-                  <rect x="58" y="150" width="104" height="12" rx="6" fill="#172554" />
-                  <line x1="82" y1="96" x2="82" y2="148" stroke="#3b82f6" strokeWidth="3" />
-                  <line x1="110" y1="96" x2="110" y2="148" stroke="#3b82f6" strokeWidth="3" />
-                  <line x1="138" y1="96" x2="138" y2="148" stroke="#3b82f6" strokeWidth="3" />
-                  <ellipse cx="110" cy="92" rx="54" ry="16" fill="#1e40af" />
-                  <ellipse cx="110" cy="89" rx="48" ry="12.5" fill="#f8fafc" />
-                  <line x1="38" y1="38" x2="96" y2="84" stroke="#d97706" strokeWidth="5" strokeLinecap="round" />
-                  <circle cx="96" cy="84" r="4.5" fill="#b45309" />
-                  <line x1="182" y1="38" x2="124" y2="84" stroke="#d97706" strokeWidth="5" strokeLinecap="round" />
-                  <circle cx="124" cy="84" r="4.5" fill="#b45309" />
-                </svg>
-              </div>
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <h3 className="text-xl font-bold text-white tracking-tight">Drum &amp; Beat</h3>
-                <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed">Menjaga tempo, dinamika ritmis, dan sinkronisasi beat lagu.</p>
-              </div>
-            </div>
-          </BlurFadeIn>
+                  <div className="relative flex items-center justify-between mb-6">
+                    <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">
+                      {item.label}
+                    </span>
+                    <Icon className={`size-5 ${item.icon}`} strokeWidth={1.5} aria-hidden="true" />
+                  </div>
 
-          {/* PIANO CARD */}
-          <BlurFadeIn delay={0.35}>
-            <div className="group rounded-3xl border border-white/10 bg-neutral-900/80 p-7 flex flex-col justify-between shadow-2xl hover:border-purple-500/40 transition-all duration-300">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Keys</span>
-                <span className="text-xs font-mono text-purple-400">Harmony</span>
-              </div>
-              {/* Piano Keys Visual */}
-              <div className="h-36 flex items-center justify-center my-3 group-hover:scale-105 transition-transform duration-300">
-                <div className="flex bg-neutral-950 p-2.5 rounded-xl border border-white/15 shadow-2xl relative">
-                  {[0, 1, 2, 3, 4, 5, 6, 7].map((k) => (
+                  {/* Icon plate — same footprint for all three cards, so the
+                      section reads as a set instead of three separate things */}
+                  <div className="relative flex h-32 items-center justify-center mb-6">
                     <div
-                      key={k}
-                      className="w-5 sm:w-6 h-20 bg-white border-r border-neutral-300 rounded-b-sm first:rounded-bl-md last:rounded-br-md last:border-r-0 shadow-sm"
+                      className={`absolute size-24 rounded-full border border-white/5 bg-white/[0.03] transition-transform duration-500 group-hover:scale-110 ${item.icon}`}
+                      aria-hidden="true"
                     />
-                  ))}
-                  {/* Black Keys */}
-                  <div className="absolute left-[28px] top-2.5 w-3.5 h-12 bg-neutral-950 rounded-b-sm shadow-md" />
-                  <div className="absolute left-[52px] top-2.5 w-3.5 h-12 bg-neutral-950 rounded-b-sm shadow-md" />
-                  <div className="absolute left-[100px] top-2.5 w-3.5 h-12 bg-neutral-950 rounded-b-sm shadow-md" />
-                  <div className="absolute left-[124px] top-2.5 w-3.5 h-12 bg-neutral-950 rounded-b-sm shadow-md" />
-                  <div className="absolute left-[148px] top-2.5 w-3.5 h-12 bg-neutral-950 rounded-b-sm shadow-md" />
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <h3 className="text-xl font-bold text-white tracking-tight">Keyboard &amp; Piano</h3>
-                <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed">Harmonisasi akord dan melodi tuts piano untuk aransemen santai.</p>
-              </div>
-            </div>
-          </BlurFadeIn>
+                    <Icon
+                      className={`relative size-14 ${item.icon} transition-transform duration-500 group-hover:scale-105`}
+                      strokeWidth={1.25}
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  <div className="relative mt-auto pt-5 border-t border-white/10">
+                    <h3 className="text-lg font-bold text-white tracking-tight leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-neutral-400 mt-2 leading-relaxed">{item.desc}</p>
+                  </div>
+                </motion.div>
+              </BlurFadeIn>
+            );
+          })}
         </div>
 
-        {/* 2. Favorite Music Section — Exact 3-Card Layout matching Screenshot */}
+        {/* 2. Favorite Music */}
         <div className="pt-10 border-t border-white/10">
-          <BlurFadeIn delay={0.1} className="mb-12">
+          <BlurFadeIn delay={0.1} className="mb-12 flex items-center gap-3">
+            <Music2 className="size-6 text-amber-300" strokeWidth={1.5} aria-hidden="true" />
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-white uppercase font-mono">
               Favorite Music
             </h3>
           </BlurFadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-14 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 md:gap-12 items-start">
             {favoriteSongs.map((song, sIdx) => {
-              const isPlaying = currentPlaying === song.id;
+              const isActive = currentId === song.id;
+              const activePlaying = isActive && isPlaying;
+              const pct = duration ? (progress / duration) * 100 : 0;
+
               return (
-                <BlurFadeIn key={song.id} delay={0.15 + sIdx * 0.1} className="flex flex-col items-center text-center w-full">
-                  {/* Audio Element */}
+                <BlurFadeIn
+                  key={song.id}
+                  delay={0.15 + sIdx * 0.1}
+                  className="flex flex-col w-full"
+                >
                   <audio
                     ref={(el) => {
                       audioRefs.current[song.id] = el;
                     }}
                     src={song.audioSrc}
-                    onEnded={() => setCurrentPlaying(null)}
                     preload="none"
+                    onPlay={() => {
+                      setCurrentId(song.id);
+                      setIsPlaying(true);
+                    }}
+                    onPause={() => setIsPlaying(false)}
+                    onEnded={() => {
+                      setIsPlaying(false);
+                      setProgress(0);
+                    }}
+                    onLoadedMetadata={(e) => {
+                      const d = e.currentTarget.duration;
+                      if (Number.isFinite(d)) setDuration(d);
+                    }}
                   />
 
-                  {/* Album Cover with Overlapping CD Disc */}
-                  <div
-                    onClick={() => togglePlay(song.id)}
-                    className="relative w-[240px] sm:w-[260px] h-[240px] sm:h-[260px] mb-6 cursor-pointer select-none group"
-                  >
-                    {/* Front Album Jacket Cover */}
-                    <div className="relative z-10 w-full h-full rounded-2xl md:rounded-3xl overflow-hidden border border-white/15 bg-neutral-800 shadow-[0_12px_36px_rgba(0,0,0,0.7)]">
+                  {/* Album jacket + disc.
+                      pr-6 / pb-6 reserves room for the overhanging disc so it
+                      never gets clipped by the grid column edge — the old
+                      -right-3/-bottom-3 pushed it outside the column and the
+                      right-hand card's disc was cut off. */}
+                  <div className="relative w-full aspect-square mb-5 pr-5 pb-5 sm:pr-6 sm:pb-6">
+                    <div
+                      className={`relative z-10 w-full h-full overflow-hidden rounded-2xl border bg-neutral-800 transition-all duration-300 ${
+                        activePlaying
+                          ? 'border-amber-400/60 shadow-[0_16px_44px_-8px_rgba(251,191,36,0.35)]'
+                          : 'border-white/15 shadow-[0_12px_36px_rgba(0,0,0,0.7)]'
+                      }`}
+                    >
                       <Image
                         src={song.coverSrc}
                         alt={`${song.title} - ${song.artist}`}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-102"
-                        sizes="280px"
+                        className="object-cover"
+                        sizes="(max-width: 640px) 90vw, (max-width: 768px) 45vw, 300px"
                       />
+
+                      {/* Play overlay — the whole jacket is the hit area */}
+                      <button
+                        type="button"
+                        onClick={() => togglePlay(song.id)}
+                        aria-label={
+                          activePlaying ? `Pause ${song.title}` : `Play ${song.title}`
+                        }
+                        aria-pressed={activePlaying}
+                        className="group/play absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/45 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-amber-400"
+                      >
+                        <span
+                          className={`flex size-16 items-center justify-center rounded-full bg-white/95 text-neutral-950 shadow-2xl transition-all duration-300 ${
+                            activePlaying
+                              ? 'opacity-100 scale-100'
+                              : 'opacity-0 scale-90 group-hover/play:opacity-100 group-hover/play:scale-100 group-focus-visible/play:opacity-100 group-focus-visible/play:scale-100'
+                          }`}
+                        >
+                          {activePlaying ? (
+                            <Pause className="size-6" strokeWidth={2} />
+                          ) : (
+                            // Nudge right so the triangle looks optically centred
+                            <Play className="size-6 translate-x-0.5" strokeWidth={2} />
+                          )}
+                        </span>
+                      </button>
                     </div>
 
-                    {/* Realistic Spinning CD Vinyl Disc on top of album (z-20) */}
+                    {/* Vinyl disc */}
                     <motion.div
-                      animate={isPlaying ? { rotate: 360 } : { rotate: 0 }}
+                      animate={activePlaying ? { rotate: 360 } : { rotate: 0 }}
                       transition={
-                        isPlaying
+                        activePlaying
                           ? { repeat: Infinity, duration: 2.2, ease: 'linear' }
                           : { duration: 0.4, ease: 'easeOut' }
                       }
                       style={{ transformOrigin: '50% 50%' }}
-                      className="absolute -right-4 -bottom-4 size-28 sm:size-32 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,0,0,0.6)] z-20 flex items-center justify-center overflow-hidden border-2 border-white/30 group-hover:scale-105"
+                      className="pointer-events-none absolute right-0 bottom-0 size-24 sm:size-28 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.9)] z-20 flex items-center justify-center overflow-hidden border-2 border-white/30"
+                      aria-hidden="true"
                     >
                       <div
                         className="absolute inset-0 rounded-full"
-                        style={{
-                          background:
-                            song.discTheme === 'laufey'
-                              ? 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #f6ead8, #efc9c0, #fdf3e0, #d8c8a8, #f3d9d2, #c9b88f, #f8eee0, #b7a88a, #f2dcd3, #efc9c0, #f6ead8)'
-                              : song.discTheme === 'oasis'
-                              ? 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #e2e8f0, #cbd5e1, #94a3b8, #cbd5e1, #f1f5f9, #94a3b8, #cbd5e1, #e2e8f0)'
-                              : 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9), transparent 46%), conic-gradient(from 210deg, #fef3c7, #fde68a, #f59e0b, #d97706, #fde68a, #fef3c7, #d97706, #fef3c7)',
-                        }}
+                        style={{ background: discThemes[song.discTheme] }}
                       />
-                      {/* CD Concentric Grooves */}
-                      <div className="absolute inset-2.5 rounded-full border border-black/15" />
-                      <div className="absolute inset-5 rounded-full border border-black/15" />
-                      <div className="absolute inset-7.5 rounded-full border border-black/15" />
-                      <div className="absolute inset-10 rounded-full border border-black/15" />
-
-                      {/* CD Center Spindle Hub */}
-                      <div className="size-8 sm:size-9 rounded-full bg-neutral-900 border-2 border-white/80 shadow-inner flex items-center justify-center">
-                        <div className="size-2.5 rounded-full bg-neutral-950 border border-neutral-700" />
+                      <div className="absolute inset-[8%] rounded-full border border-black/15" />
+                      <div className="absolute inset-[18%] rounded-full border border-black/15" />
+                      <div className="absolute inset-[28%] rounded-full border border-black/15" />
+                      <div className="absolute inset-[38%] rounded-full border border-black/15" />
+                      <div className="size-7 sm:size-8 rounded-full bg-neutral-900 border-2 border-white/80 shadow-inner flex items-center justify-center">
+                        <div className="size-2 rounded-full bg-neutral-950 border border-neutral-700" />
                       </div>
                     </motion.div>
                   </div>
 
-                  {/* 4 Amber Equalizer Dots — animate scaleY when playing */}
-                  <div className="flex items-end justify-center gap-2 mb-3 mt-1 h-3" aria-hidden="true">
-                    {[0, 1, 2, 3].map((dotIdx) => (
-                      <motion.span
-                        key={dotIdx}
-                        className="w-1.5 rounded-full bg-amber-500"
-                        style={{ originY: 0.5 }}
-                        animate={
-                          isPlaying
-                            ? { scaleY: [0.4, 1.6, 0.6, 1.2, 0.4] }
-                            : { scaleY: 1 }
-                        }
-                        transition={
-                          isPlaying
-                            ? {
-                                duration: 0.9,
-                                repeat: Infinity,
-                                ease: 'easeInOut',
-                                delay: dotIdx * 0.12,
-                              }
-                            : { duration: 0.3, ease: 'easeOut' }
-                        }
-                      />
-                    ))}
+                  {/* Meta + transport */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h4 className="text-lg font-bold text-white tracking-tight leading-snug truncate">
+                        {song.title}
+                      </h4>
+                      <p className="text-sm font-medium text-neutral-400 mt-0.5">{song.artist}</p>
+                    </div>
+
+                    {/* Equalizer — visible state for "this track is playing" */}
+                    <div
+                      className="flex shrink-0 items-end gap-[3px] h-5 pt-1"
+                      aria-hidden="true"
+                    >
+                      {[0, 1, 2, 3].map((dotIdx) => (
+                        <motion.span
+                          key={dotIdx}
+                          className={`w-[3px] rounded-full ${
+                            activePlaying ? 'bg-amber-400' : 'bg-neutral-700'
+                          }`}
+                          style={{ originY: 1 }}
+                          animate={
+                            activePlaying
+                              ? { height: ['20%', '100%', '45%', '80%', '20%'] }
+                              : { height: '20%' }
+                          }
+                          transition={
+                            activePlaying
+                              ? {
+                                  duration: 0.9,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut',
+                                  delay: dotIdx * 0.12,
+                                }
+                              : { duration: 0.3, ease: 'easeOut' }
+                          }
+                        />
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Track Title (Bold) */}
-                  <h4 className="text-xl font-bold text-white tracking-tight leading-snug">
-                    {song.title}
-                  </h4>
-
-                  {/* Artist Name (Muted) */}
-                  <p className="text-sm font-medium text-neutral-400 mt-1">
-                    {song.artist}
+                  <p className="mt-2 text-[11px] font-mono uppercase tracking-widest text-neutral-500">
+                    {song.genre}
                   </p>
+
+                  {/* Seek bar — only meaningful once the track is the active one */}
+                  <AnimatePresence initial={false}>
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div
+                          onClick={(e) => handleSeek(song.id, e)}
+                          role="slider"
+                          tabIndex={0}
+                          aria-label={`Seek ${song.title}`}
+                          aria-valuemin={0}
+                          aria-valuemax={Math.round(duration)}
+                          aria-valuenow={Math.round(progress)}
+                          aria-valuetext={`${formatTime(progress)} of ${formatTime(duration)}`}
+                          onKeyDown={(e) => {
+                            const audio = audioRefs.current[song.id];
+                            if (!audio || !audio.duration) return;
+                            if (e.key === 'ArrowRight') {
+                              audio.currentTime = Math.min(audio.currentTime + 5, audio.duration);
+                              setProgress(audio.currentTime);
+                            } else if (e.key === 'ArrowLeft') {
+                              audio.currentTime = Math.max(audio.currentTime - 5, 0);
+                              setProgress(audio.currentTime);
+                            }
+                          }}
+                          // 44px tall hit area — the visible bar is 4px, but the
+                          // touch target has to be finger-sized.
+                          className="group/seek mt-3 flex h-11 cursor-pointer items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 rounded"
+                        >
+                          <div className="relative h-1 w-full rounded-full bg-white/10">
+                            <div
+                              className="absolute inset-y-0 left-0 rounded-full bg-amber-400 transition-[width] duration-200 ease-linear"
+                              style={{ width: `${pct}%` }}
+                            />
+                            <div
+                              className="absolute top-1/2 size-2.5 -translate-y-1/2 -translate-x-1/2 rounded-full bg-amber-400 opacity-0 transition-opacity group-hover/seek:opacity-100"
+                              style={{ left: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-between font-mono text-[10px] text-neutral-500 -mt-5">
+                          <span>{formatTime(progress)}</span>
+                          <span>{formatTime(duration)}</span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {!isActive && (
+                    <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-neutral-600">
+                      <AudioWaveform className="size-3" strokeWidth={1.5} aria-hidden="true" />
+                      Klik sampul untuk memutar
+                    </p>
+                  )}
                 </BlurFadeIn>
               );
             })}
