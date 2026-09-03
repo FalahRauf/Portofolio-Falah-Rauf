@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowRight, Info } from 'lucide-react';
 import { BackgroundPaths } from '@/components/ui/background-paths';
+import InteractiveDots from './interactive-dots';
 
 interface HeroKintaroProps {
   portraitsCol1: string[];
@@ -17,35 +18,11 @@ export default function HeroKintaro({
   const reduceMotion = useReducedMotion();
   const col1Images = [...portraitsCol1, ...portraitsCol1, ...portraitsCol1, ...portraitsCol1];
   const col2Images = [...portraitsCol2, ...portraitsCol2, ...portraitsCol2, ...portraitsCol2];
-  const stars = Array.from({ length: 45 }, (_, i) => ({
-    x: `${(i * 19) % 100}%`,
-    y: `${(i * 29) % 100}%`,
-    size: (i % 2) + 1,
-    opacity: ((i % 5) + 3) * 0.1,
-  }));
 
   return (
     <div className="relative h-screen min-h-[720px] w-full overflow-hidden bg-neutral-950 text-white">
-      {/* Existing animated background, kept subtle behind the new composition. */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-35">
-        <BackgroundPaths title="" />
-      </div>
-
-      <div className="absolute inset-0 z-[1] pointer-events-none" aria-hidden="true">
-        {stars.map((star, i) => (
-          <span
-            key={i}
-            className="absolute rounded-full bg-white"
-            style={{
-              left: star.x,
-              top: star.y,
-              width: star.size,
-              height: star.size,
-              opacity: star.opacity,
-            }}
-          />
-        ))}
-      </div>
+      {/* Star field. The dots drift away from the cursor as it approaches. */}
+      <InteractiveDots count={45} radius={140} strength={28} />
 
       {/* Left editorial hero content. Navbar remains independent from this layout. */}
       <div className="relative z-10 h-full w-full px-6 sm:px-10 lg:px-16 xl:px-20">

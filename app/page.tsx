@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import CustomCursor from '@/components/blocks/custom-cursor';
 import { AnimatedNavFramer } from '@/components/ui/navigation-menu';
 import SmoothScrollProvider from '@/components/blocks/smooth-scroll-provider';
+import { PointerProvider } from '@/components/blocks/pointer-context';
 import HeroKintaro from '@/components/blocks/hero-kintaro';
 import AboutSection from '@/components/blocks/about-section';
 import HobbiesSection from '@/components/blocks/hobbies-section';
@@ -97,6 +98,7 @@ export default function Home() {
 
   return (
     <SmoothScrollProvider>
+      <PointerProvider>
       <div className="min-h-screen bg-neutral-950 text-white font-sans selection:bg-white selection:text-black">
         {/* Interactive Custom Concentric Mouse Follower */}
         <CustomCursor />
@@ -196,6 +198,7 @@ export default function Home() {
           &copy; 2026 FALAH RAUF ALVARO WARADANA. ALL RIGHTS RESERVED.
         </footer>
       </div>
+      </PointerProvider>
     </SmoothScrollProvider>
   );
 }
