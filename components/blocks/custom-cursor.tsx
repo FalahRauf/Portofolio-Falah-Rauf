@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export default function CustomCursor() {
@@ -17,6 +17,13 @@ export default function CustomCursor() {
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
+  // Perf: the old handler called target.closest() on EVERY mousemove. With Lenis
+  // smooth-scroll running, mousemove fires constantly, and closest() walks up the
+  // DOM tree each time — that's a layout-adjacent query at pointer-event rate.
+  // Now we cache the last hit target and only re-run the query when the element
+  // under the pointer actually changes.
+  const lastTargetRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (typeof window === 'undefined' || window.matchMedia('(pointer: coarse)').matches) {
       return;
@@ -25,15 +32,16 @@ export default function CustomCursor() {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      if (!isVisible) setIsVisible(true);
+      setIsVisible(true);
 
       const target = e.target as HTMLElement | null;
-      if (target) {
-        const isInteractive = Boolean(
-          target.closest('a, button, [role="button"], input, textarea, .cursor-pointer, .group')
-        );
-        setIsHovered(isInteractive);
-      }
+      if (!target || target === lastTargetRef.current) return;
+      lastTargetRef.current = target;
+
+      const isInteractive = Boolean(
+        target.closest('a, button, [role="button"], input, textarea, .cursor-pointer, .group')
+      );
+      setIsHovered(isInteractive);
     };
 
     const handleMouseDown = () => setIsClicked(true);
@@ -54,7 +62,7 @@ export default function CustomCursor() {
       document.body.removeEventListener('mouseleave', handleMouseLeave);
       document.body.removeEventListener('mouseenter', handleMouseEnter);
     };
-  }, [mouseX, mouseY, isVisible]);
+  }, [mouseX, mouseY]);
 
   if (!isVisible) return null;
 

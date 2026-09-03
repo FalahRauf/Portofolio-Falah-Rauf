@@ -1,20 +1,38 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 
-function FloatingPaths({ position }: { position: number }) {
-  const paths = Array.from({ length: 36 }, (_, i) => ({
-    id: i,
-    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
-      380 - i * 5 * position
-    } -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
-      152 - i * 5 * position
-    } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
-      684 - i * 5 * position
-    } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
-    width: 0.5 + i * 0.03,
-  }));
+// Was: 36 <motion.path> per instance x2 instances = 72 nodes whose `pathLength`,
+// `opacity` and `pathOffset` Framer Motion rewrote every single frame. Each write
+// dirties the SVG and forces a re-render + repaint of the whole subtree, forever,
+// even while scrolling.
+//
+// Now: identical 36 paths, identical `d`, identical strokeWidth/strokeOpacity, but
+// the draw + fade is a pure CSS animation on stroke-dasharray/offset. No React in
+// the loop. Durations are deterministic (not Math.random(), which also caused a
+// hydration mismatch on every SSR render).
+
+function FloatingPaths({ position, seedOffset }: { position: number; seedOffset: number }) {
+  const paths = useMemo(
+    () =>
+      Array.from({ length: 36 }, (_, i) => ({
+        id: i,
+        d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
+          380 - i * 5 * position
+        } -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
+          152 - i * 5 * position
+        } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
+          684 - i * 5 * position
+        } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
+        color: `rgba(15,23,42,${0.1 + i * 0.03})`,
+        width: 0.5 + i * 0.03,
+        // Deterministic spread across 28-42s, mirroring the old random range.
+        duration: 28 + ((i * 7 + seedOffset * 3) % 14),
+        delay: -((i * 11 + seedOffset * 5) % 20),
+      })),
+    [position, seedOffset]
+  );
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -26,22 +44,17 @@ function FloatingPaths({ position }: { position: number }) {
       >
         <title>Background Paths</title>
         {paths.map((path) => (
-          <motion.path
+          <path
             key={path.id}
             d={path.d}
             stroke="currentColor"
             strokeWidth={path.width}
-            strokeOpacity={0.1 + path.id * 0.03}
-            initial={{ pathLength: 0.3, opacity: 0.6 }}
-            animate={{
-              pathLength: 1,
-              opacity: [0.3, 0.6, 0.3],
-              pathOffset: [0, 1, 0],
-            }}
-            transition={{
-              duration: 28 + Math.random() * 14,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
+            pathLength={1}
+            className="animate-float-path"
+            style={{
+              strokeOpacity: 0.1 + path.id * 0.03,
+              animationDuration: `${path.duration}s`,
+              animationDelay: `${path.delay}s`,
             }}
           />
         ))}
@@ -60,8 +73,8 @@ export function BackgroundPaths({
   return (
     <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <FloatingPaths position={1} />
-        <FloatingPaths position={-1} />
+        <FloatingPaths position={1} seedOffset={0} />
+        <FloatingPaths position={-1} seedOffset={7} />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 md:px-6 text-center">
