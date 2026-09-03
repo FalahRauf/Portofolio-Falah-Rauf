@@ -101,7 +101,7 @@ export default function ProjectsHorizontal({ projects }: ProjectsHorizontalProps
                 className="group relative shrink-0 w-[85vw] sm:w-[75vw] md:w-[680px] lg:w-[780px] h-[68vh] md:h-[76vh] rounded-3xl overflow-hidden border border-white/10 bg-neutral-900 flex flex-col justify-between p-6 md:p-10 transition-all duration-500 hover:border-white/30 hover:shadow-[0_0_60px_rgba(255,255,255,0.06)] cursor-pointer"
               >
                 {/* Background image preview */}
-                <div className="absolute inset-0 z-0 overflow-hidden bg-neutral-950 contain-paint">
+                <div className="absolute inset-0 z-0 overflow-hidden bg-neutral-950">
                   <Image
                     src={p.imageSrc}
                     alt={p.title}

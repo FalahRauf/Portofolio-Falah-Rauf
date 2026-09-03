@@ -88,75 +88,7 @@
   }
 }
 
-/* ---- Scroll performance ----
-   Containment only: these tell the browser it can repaint one decorative layer
-   without repainting its neighbours. No property here changes how anything
-   looks, and nothing here affects layout, so there is no risk of the page
-   shifting height the way `content-visibility` would. */
-
-/* The two continuously-animating layers (hero collage columns, marquee rows)
-   and the background-path SVG. `contain: paint` clips each to its own box so an
-   animation tick inside it can't invalidate anything outside it.
-   Safe on these because they are all `overflow-hidden` / purely decorative
-   already — containment adds nothing visually. */
-.will-change-transform,
-.animate-float-path {
-  transform: translateZ(0);
-}
-
-/* Big image panels: the browser can skip rasterising a card's photo while that
-   card is scrolled off-screen, and never has to repaint past the panel's
-   rounded corners. */
-.contain-paint {
-  contain: paint;
-}
-
 html { scroll-behavior: smooth; }
-
-/* Compositor-driven marquee. Replaces a useAnimationFrame loop that read
-   scrollWidth every frame (4 instances = 4 forced layouts per frame). */
-@keyframes marquee-left {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(-50%, 0, 0); }
-}
-
-@keyframes marquee-right {
-  from { transform: translate3d(-50%, 0, 0); }
-  to   { transform: translate3d(0, 0, 0); }
-}
-
-/* Floating-path stroke animation (background-paths.tsx).
-   Mirrors the old Framer Motion props exactly:
-     pathLength 0.3 -> 1   => dash segment grows from 30% to 100% of the path
-     pathOffset 0 -> 1     => the segment travels along the path
-     opacity 0.3/0.6/0.3   => the fade pulse
-   Units are normalized to 1 with pathLength="1" on the element, so dasharray
-   values are plain fractions regardless of each path's real length. */
-.animate-float-path {
-  stroke-dasharray: 0.3 0.7;
-  stroke-dashoffset: 0;
-  animation-name: float-path;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-@keyframes float-path {
-  0% {
-    stroke-dasharray: 0.3 0.7;
-    stroke-dashoffset: 0;
-    opacity: 0.6;
-  }
-  50% {
-    stroke-dasharray: 1 0;
-    stroke-dashoffset: 0.5;
-    opacity: 0.6;
-  }
-  100% {
-    stroke-dasharray: 0.3 0.7;
-    stroke-dashoffset: 1;
-    opacity: 0.3;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -15,10 +15,8 @@ export default function HeroKintaro({
   portraitsCol2,
 }: HeroKintaroProps) {
   const reduceMotion = useReducedMotion();
-  // Two copies is the minimum for a seamless -50% loop. The original four
-  // rendered 40 <Image> nodes (decode + memory) to show the same 10 photos.
-  const col1Images = [...portraitsCol1, ...portraitsCol1];
-  const col2Images = [...portraitsCol2, ...portraitsCol2];
+  const col1Images = [...portraitsCol1, ...portraitsCol1, ...portraitsCol1, ...portraitsCol1];
+  const col2Images = [...portraitsCol2, ...portraitsCol2, ...portraitsCol2, ...portraitsCol2];
   const stars = Array.from({ length: 45 }, (_, i) => ({
     x: `${(i * 19) % 100}%`,
     y: `${(i * 29) % 100}%`,
